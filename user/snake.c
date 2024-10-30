@@ -32,19 +32,16 @@ void draw_border() {
     }
     for (int i = 0; i < WIDTH + 2; i++) printf("#");
     printf("\n");
-    move_cursor();
 }
 
 void draw_snake(Snake *snake) {
     for (int i = 0; i < snake->length; i++) {
         printf("\033[%d;%dH@", snake->body[i].y + 2, snake->body[i].x + 2);
     }
-    move_cursor();
 }
 
 void draw_food(Point *food) {
     printf("\033[%d;%dH*", food->y + 2, food->x + 2);
-    move_cursor();
 }
 
 void update_snake(Snake *snake) {
@@ -53,7 +50,6 @@ void update_snake(Snake *snake) {
     }
     snake->body[0].x += snake->direction.x;
     snake->body[0].y += snake->direction.y;
-    move_cursor();
 }
 
 int check_collision(Snake *snake) {
@@ -78,7 +74,6 @@ void place_food(Point *food, Snake *snake) {
             }
         }
     } while (!valid);
-    move_cursor();
 }
 
 void game_over(Snake *snake) {
@@ -119,7 +114,7 @@ int main() {
         }
         if (check_collision(&snake)){
             game_over(&snake);
-            break;
+            return 0;
         }
         if (snake.body[0].x == food.x && snake.body[0].y == food.y) {
             if (snake.length < SNAKE_MAX_LENGTH) snake.length++;
@@ -130,6 +125,7 @@ int main() {
         draw_border();
         draw_snake(&snake);
         draw_food(&food);
+        move_cursor();
         sleep(3);
     }
     return 0;

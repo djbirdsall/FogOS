@@ -145,9 +145,9 @@ consolekeys(int user_dst, uint64 dst, int n)
 
     c = cons.buf[cons.r++ % INPUT_BUF_SIZE];
     // copy the input byte to the user-space buffer.
+    cons.w = cons.e;
     cbuf = c;
     if (c != '\033' && c!= '[' && c != 'A' && c != 'B' && c != 'C' && c != 'D'){
-        uartputc_sync(c); uartputc_sync(' '); uartputc_sync(c);
         cons.r--;
         break;
     }
