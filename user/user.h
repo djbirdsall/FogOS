@@ -41,3 +41,13 @@ void free(void*);
 int atoi(const char*);
 int memcmp(const void *, const void *, uint);
 void *memcpy(void *, const void *, uint);
+
+// Functions for game-related system calls
+void clear_screen(void);
+void draw_border(void);
+void draw_snake(Snake *snake);
+void draw_food(Point *food);
+void update_snake(Snake *snake);
+int check_collision(Snake *snake);
+void place_food(Point *food, Snake *snake);
+void game_over(void);

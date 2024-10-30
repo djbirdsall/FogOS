@@ -102,6 +102,15 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 
+extern void sys_clear_screen(void);
+extern void sys_draw_border(void);
+extern void sys_draw_snake(void);
+extern void sys_draw_food(void);
+extern void sys_update_snake(void);
+extern void sys_check_collision(void);
+extern void sys_place_food(void);
+extern void sys_game_over(void);
+
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
 static uint64 (*syscalls[])(void) = {
@@ -145,3 +154,14 @@ syscall(void)
     p->trapframe->a0 = -1;
   }
 }
+
+static void (*syscalls[])(void) = {
+    [SYS_clear_screen] sys_clear_screen,
+    [SYS_draw_border] sys_draw_border,
+    [SYS_draw_snake] sys_draw_snake,
+    [SYS_draw_food] sys_draw_food,
+    [SYS_update_snake] sys_update_snake,
+    [SYS_check_collision] sys_check_collision,
+    [SYS_place_food] sys_place_food,
+    [SYS_game_over] sys_game_over,
+};
