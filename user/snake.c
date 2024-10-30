@@ -4,7 +4,7 @@
 
 #define WIDTH 20
 #define HEIGHT 10
-#define SNAKE_MAX_LENGTH 100
+#define SNAKE_MAX_LENGTH 20
 
 uint32 rand() {
     uint32 x = uptime();
