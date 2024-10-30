@@ -7,15 +7,13 @@
 #define HEIGHT 10
 #define SNAKE_MAX_LENGTH 100
 
-typedef struct {
-    int x, y;
-} Point;
-
-typedef struct {
-    Point body[SNAKE_MAX_LENGTH];
-    int length;
-    Point direction;
-} Snake;
+uint32 rand() {
+    uint32 x = uptime();
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    return x;
+}
 
 void clear_screen() {
     printf("\033[H\033[J");
@@ -107,7 +105,7 @@ int main() {
         draw_border();
         draw_snake(&snake);
         draw_food(&food);
-        sleep(1);
+        sleep(100);
     }
     return 0;
 }

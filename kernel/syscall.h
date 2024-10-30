@@ -20,12 +20,3 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
-//snake system calls
-#define SYS_clear_screen 22
-#define SYS_draw_border 23
-#define SYS_draw_snake 24
-#define SYS_draw_food 25
-#define SYS_update_snake 26
-#define SYS_check_collision 27
-#define SYS_place_food 28
-#define SYS_game_over 29
