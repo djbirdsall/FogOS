@@ -80,6 +80,20 @@ sys_read(void)
 }
 
 uint64
+sys_keys(void)
+{
+  struct file *f;
+  int n;
+  uint64 p;
+
+  argaddr(1, &p);
+  argint(2, &n);
+  if(argfd(0, 0, &f) < 0)
+    return -1;
+  return filekeys(f, p, n);
+}
+
+uint64
 sys_write(void)
 {
   struct file *f;

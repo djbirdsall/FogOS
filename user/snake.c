@@ -1,7 +1,6 @@
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
-#include "kernel/fcntl.h"
 
 #define WIDTH 20
 #define HEIGHT 10
@@ -13,6 +12,10 @@ uint32 rand() {
     x ^= x >> 17;
     x ^= x << 5;
     return x;
+}
+
+void move_cursor() {
+    printf("\033[%d;1H", HEIGHT + 3);
 }
 
 void clear_screen() {
@@ -29,16 +32,19 @@ void draw_border() {
     }
     for (int i = 0; i < WIDTH + 2; i++) printf("#");
     printf("\n");
+    move_cursor();
 }
 
 void draw_snake(Snake *snake) {
     for (int i = 0; i < snake->length; i++) {
         printf("\033[%d;%dH@", snake->body[i].y + 2, snake->body[i].x + 2);
     }
+    move_cursor();
 }
 
 void draw_food(Point *food) {
     printf("\033[%d;%dH*", food->y + 2, food->x + 2);
+    move_cursor();
 }
 
 void update_snake(Snake *snake) {
@@ -47,6 +53,7 @@ void update_snake(Snake *snake) {
     }
     snake->body[0].x += snake->direction.x;
     snake->body[0].y += snake->direction.y;
+    move_cursor();
 }
 
 int check_collision(Snake *snake) {
@@ -71,11 +78,14 @@ void place_food(Point *food, Snake *snake) {
             }
         }
     } while (!valid);
+    move_cursor();
 }
 
-void game_over() {
+void game_over(Snake *snake) {
     printf("\033[%d;%dHGame Over!\n", HEIGHT / 2 + 2, WIDTH / 2 - 4);
-    exit(0);
+    printf("\033[%d;%dHYou scored %d!\n", HEIGHT / 2 + 3, WIDTH / 2 - 4, snake->length-1);
+    move_cursor();
+    return;
 }
 
 int main() {
@@ -95,7 +105,22 @@ int main() {
     draw_food(&food);
 
     while (1) {
-        if (check_collision(&snake)) game_over();
+        char input[3]; // Buffer to store escape sequences
+        int n = keys(0, input, 3); // Read up to 3 characters
+        if (n > 0) {
+            if (n == 3 && input[0] == '\033' && input[1] == '[') {
+                switch (input[2]) {
+                    case 'A': if (snake.direction.y == 0) { snake.direction.x = 0; snake.direction.y = -1; } break; // Up
+                    case 'B': if (snake.direction.y == 0) { snake.direction.x = 0; snake.direction.y = 1; } break;  // Down
+                    case 'C': if (snake.direction.x == 0) { snake.direction.x = 1; snake.direction.y = 0; } break; // Right
+                    case 'D': if (snake.direction.x == 0) { snake.direction.x = -1; snake.direction.y = 0; } break; // Left
+                }
+            }
+        }
+        if (check_collision(&snake)){
+            game_over(&snake);
+            break;
+        }
         if (snake.body[0].x == food.x && snake.body[0].y == food.y) {
             if (snake.length < SNAKE_MAX_LENGTH) snake.length++;
             place_food(&food, &snake);
@@ -105,7 +130,7 @@ int main() {
         draw_border();
         draw_snake(&snake);
         draw_food(&food);
-        sleep(100);
+        sleep(3);
     }
     return 0;
 }

@@ -126,6 +126,43 @@ consoleread(int user_dst, uint64 dst, int n)
   return target - n;
 }
 
+//Get current keypress from console with no delay.
+int
+consolekeys(int user_dst, uint64 dst, int n)
+{
+  uint target;
+  int c;
+  char cbuf;
+
+  target = n;
+  acquire(&cons.lock);
+  while(n > 0){
+  
+    if(killed(myproc())){
+        release(&cons.lock);
+        return -1;
+    }
+
+    c = cons.buf[cons.r++ % INPUT_BUF_SIZE];
+    // copy the input byte to the user-space buffer.
+    cbuf = c;
+    if (c != '\033' && c!= '[' && c != 'A' && c != 'B' && c != 'C' && c != 'D'){
+        uartputc_sync(c); uartputc_sync(' '); uartputc_sync(c);
+        cons.r--;
+        break;
+    }
+
+    if(either_copyout(user_dst, dst, &cbuf, 1) == -1)
+      break;
+
+    dst++;
+    --n;
+  }
+  release(&cons.lock);
+
+  return target - n;
+}
+
 //
 // the console input interrupt handler.
 // uartintr() calls this for input character.
@@ -188,5 +225,6 @@ consoleinit(void)
   // connect read and write system calls
   // to consoleread and consolewrite.
   devsw[CONSOLE].read = consoleread;
+  devsw[CONSOLE].keys = consolekeys;
   devsw[CONSOLE].write = consolewrite;
 }
